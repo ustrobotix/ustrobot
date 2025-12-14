@@ -574,11 +574,11 @@
         const robotGroup = new THREE.Group();
         scene.add(robotGroup);
 
-        // Elegant Materials
-        const orangeMat = new THREE.MeshStandardMaterial({ color: 0xff5500, roughness: 0.1, metalness: 0.7 }); 
-        const greyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.2, metalness: 0.8 });
-        const blackMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
-        const glowMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 });
+        // Elegant Materials (Updated: Pure Light/White Theme)
+        const orangeMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.5 }); // Main Body: White
+        const greyMat = new THREE.MeshStandardMaterial({ color: 0xc0c0c0, roughness: 0.2, metalness: 0.8 }); // Chrome/Silver Details
+        const blackMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.1, metalness: 0.9 }); 
+        const glowMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 }); // Cyan Eyes
 
         // Head
         const headGroup = new THREE.Group();
@@ -608,15 +608,16 @@
         const rightArm = new THREE.Mesh(armGeo, orangeMat);
         rightArm.position.set(1.2, -2.2, 0); rightArm.rotation.z = -0.2; robotGroup.add(rightArm);
 
-        // --- MECHANICAL HAND (Restored) ---
+        // --- MECHANICAL HAND (Restored & Light Theme) ---
         const masterHandGroup = new THREE.Group();
         scene.add(masterHandGroup);
         masterHandGroup.scale.set(1.8, 1.8, 1.8);
         masterHandGroup.visible = false; // Initially hidden until triggered
 
-        const rawMetalMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.6, metalness: 0.6 });
-        const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8, metalness: 0.4 });
-        const boltMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.4, metalness: 0.9 });
+        // Light/White Metal Materials for Hand
+        const rawMetalMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4, metalness: 0.7 }); // Polished White Metal
+        const darkMetalMat = new THREE.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.5, metalness: 0.5 }); // Light Aluminium
+        const boltMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.4, metalness: 0.8 }); // Chrome Bolts
         const accentMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 }); 
 
         // Hand Parts (simplified rebuild from previous code)
@@ -670,6 +671,9 @@
             const triggers = document.querySelectorAll('.program-trigger');
             triggers.forEach(trigger => {
                 const updateTarget = () => {
+                    // Check if on mobile (screen width < 768px)
+                    if (window.innerWidth < 768) return; 
+
                     if (!robotGroup.visible) return; // Only work if on home page
                     activeCard = trigger;
                     masterHandGroup.visible = true;
@@ -725,6 +729,16 @@
             lastScrollY = currentScrollY;
         });
 
+        // Resize Logic to hide hand on mobile
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            if (window.innerWidth < 768) {
+                masterHandGroup.visible = false;
+            }
+        });
+
         // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
@@ -756,13 +770,6 @@
             const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
             headGroup.rotation.y = mouseX * 0.5;
             headGroup.rotation.x = -mouseY * 0.3;
-        });
-
-        // Resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>

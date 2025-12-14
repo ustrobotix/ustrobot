@@ -12,7 +12,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -27,8 +27,8 @@
                 extend: {
                     colors: {
                         void: "#02040A", /* Deeper, richer black/blue */
-                        neonCyan: "#06b6d4", /* Cyan-500: More elegant than pure #00FFFF */
-                        neonOrange: "#f97316", /* Orange-500: Vibrant but not neon-burn */
+                        neonCyan: "#06b6d4", /* Cyan-500 */
+                        neonOrange: "#f97316", /* Orange-500 */
                         lightBg: "#f0f4f8", /* Soft blue-grey white */
                         lightTextMain: "#1e293b",
                         lightTextSub: "#475569",
@@ -41,11 +41,21 @@
                     },
                     animation: {
                         'grow-bar': 'growBar 1.5s ease-out forwards',
+                        'float-slow': 'floatSlow 4s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s infinite',
                     },
                     keyframes: {
                         growBar: {
                             '0%': { width: '0%' },
                             '100%': { width: 'var(--target-width)' }
+                        },
+                        floatSlow: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { textShadow: '0 0 10px rgba(6, 182, 212, 0.2)' },
+                            '50%': { textShadow: '0 0 20px rgba(6, 182, 212, 0.6)' },
                         }
                     }
                 }
@@ -113,16 +123,117 @@
         .stat-bar-container { width: 100%; background: rgba(150,150,150,0.2); border-radius: 99px; height: 1.2rem; overflow: hidden; position: relative; }
         .stat-bar-fill { height: 100%; border-radius: 99px; width: 0; transition: width 1s ease-out; }
         
-        /* Card Styles */
+        /* Card Styles & Animations */
         .mecha-screen {
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.6); border-radius: 24px; overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
         .dark .mecha-screen { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); }
         .mecha-wrapper:hover .mecha-screen { transform: translateY(-8px); box-shadow: 0 20px 40px -5px rgba(0,0,0,0.2); }
-        .dark .mecha-wrapper:hover .mecha-screen { box-shadow: 0 20px 40px -5px rgba(0,0,0,0.6), 0 0 15px rgba(6, 182, 212, 0.2); border-color: rgba(6, 182, 212, 0.5); }
+        .dark .mecha-wrapper:hover .mecha-screen { box-shadow: 0 20px 40px -5px rgba(0,0,0,0.6), 0 0 20px rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.4); }
 
+        /* Image Micro-animation */
+        .card-img-zoom {
+            transition: transform 0.7s ease;
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .mecha-screen:hover .card-img-zoom {
+            transform: scale(1.1);
+        }
+
+        /* NEW GLASS BUTTON (Updated for Hero Use too) */
+        .glass-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.8rem 2rem;
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #2563eb;
+            background: rgba(255, 255, 255, 0.3); /* Translucent */
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 9999px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(12px); /* Blurry glass effect */
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+            cursor: pointer;
+        }
+        
+        .dark .glass-btn {
+            color: #06b6d4;
+            border-color: rgba(6, 182, 212, 0.4);
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-btn::before {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            transition: 0.6s;
+            transform: skewX(-25deg);
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(37, 99, 235, 0.8);
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.5);
+            color: white;
+        }
+
+        .glass-btn:hover::before {
+            left: 150%;
+        }
+
+        .dark .glass-btn:hover {
+            background: rgba(6, 182, 212, 0.3);
+            border-color: #06b6d4;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.6), inset 0 0 10px rgba(6, 182, 212, 0.2);
+            color: white;
+            text-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+
+        /* Secondary Hero Button Variation */
+        .glass-btn-secondary {
+            background: transparent;
+            border: 2px solid rgba(148, 163, 184, 0.5);
+            color: #475569;
+        }
+        .dark .glass-btn-secondary {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #cbd5e1;
+        }
+        .glass-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: currentColor;
+            color: #0f172a;
+        }
+        .dark .glass-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Typography */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .dark .text-glow {
+            text-shadow: 0 0 30px rgba(255,255,255,0.2), 0 0 10px rgba(6,182,212,0.3);
+        }
+
+        /* Social Buttons */
         .social-btn {
             width: 3.5rem; height: 3.5rem; border-radius: 9999px;
             display: flex; align-items: center; justify-content: center;
@@ -147,7 +258,7 @@
         <!-- Navigation -->
         <nav class="fixed top-4 w-[95%] max-w-7xl left-1/2 -translate-x-1/2 z-50 px-4 md:px-6 py-3 flex justify-between items-center transition-all duration-300 ios-glass rounded-full shadow-lg">
             <div class="flex items-center gap-3 cursor-pointer" onclick="switchPage('home')">
-                <img src="logo.jpg" alt="Logo" class="w-10 h-10 rounded-full border border-white/20 shadow-md">
+                <img src="logo.jpg" alt="Logo" class="w-10 h-10 rounded-full border border-white/20 shadow-md transition-transform hover:rotate-12 duration-500">
                 <span class="font-orbitron font-bold text-lg md:text-xl tracking-wider text-slate-800 dark:text-white">USTROBOTIX</span>
             </div>
             
@@ -196,21 +307,25 @@
         <div id="page-home" class="page-section active">
             <section class="min-h-[85vh] flex flex-col items-center justify-center text-center px-4 pt-10">
                 <div class="space-y-6 fade-in-up hero-glass-wrapper mt-10">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-lightPrimary/20 dark:border-neonCyan/30 bg-lightPrimary/5 dark:bg-neonCyan/5 backdrop-blur-sm">
-                        <span class="w-2 h-2 rounded-full bg-lightPrimary dark:bg-neonCyan animate-pulse"></span>
-                        <span class="text-xs font-mono text-lightPrimary dark:text-neonCyan uppercase tracking-widest">Next-Gen Robotics</span>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-lightPrimary/20 dark:border-neonCyan/30 bg-lightPrimary/5 dark:bg-neonCyan/5 backdrop-blur-sm group cursor-default">
+                        <span class="w-2 h-2 rounded-full bg-lightPrimary dark:bg-neonCyan animate-ping absolute opacity-75"></span>
+                        <span class="w-2 h-2 rounded-full bg-lightPrimary dark:bg-neonCyan relative"></span>
+                        <span class="text-xs font-mono text-lightPrimary dark:text-neonCyan uppercase tracking-widest group-hover:tracking-[0.2em] transition-all duration-300">Next-Gen Robotics</span>
                     </div>
-                    <h1 class="font-orbitron text-5xl md:text-7xl lg:text-9xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-slate-800 to-slate-500 dark:from-white dark:to-white/40 pb-2">
+                    
+                    <h1 class="font-orbitron text-5xl md:text-7xl lg:text-9xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-slate-800 to-slate-500 dark:from-white dark:to-white/40 pb-2 text-glow animate-pulse-glow">
                         POWERING <br/> YOUNG MINDS
                     </h1>
+                    
                     <p class="text-slate-600 dark:text-gray-300 max-w-xl mx-auto text-lg leading-relaxed font-light">
                         Bridging the gap between theory and reality through advanced robotics and research.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                        <button onclick="switchPage('services')" class="px-8 py-3 bg-gradient-to-r from-lightPrimary to-blue-700 dark:from-white dark:to-gray-300 text-white dark:text-black font-bold uppercase rounded-full hover:scale-105 transition-all shadow-lg">
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+                        <button onclick="switchPage('services')" class="glass-btn">
                             Explore
                         </button>
-                        <button onclick="switchPage('contact')" class="px-8 py-3 border border-slate-300 dark:border-white/20 font-bold uppercase rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-all backdrop-blur-sm">
+                        <button onclick="switchPage('contact')" class="glass-btn glass-btn-secondary">
                             Consultation
                         </button>
                     </div>
@@ -225,13 +340,13 @@
                         <div class="mecha-card-container">
                             <div class="mecha-screen">
                                 <div class="h-48 relative overflow-hidden">
-                                    <img src="353345.jpg" class="w-full h-full object-cover">
-                                    <span class="absolute top-2 left-2 bg-neonOrange text-white text-[10px] font-bold px-2 py-1 rounded font-orbitron shadow-md">LEVEL 1</span>
+                                    <img src="353345.jpg" class="card-img-zoom">
+                                    <span class="absolute top-2 left-2 bg-neonOrange text-white text-[10px] font-bold px-3 py-1 rounded font-orbitron shadow-md animate-float-slow">LEVEL 1</span>
                                 </div>
                                 <div class="p-6 text-center">
                                     <h3 class="text-xl font-bold font-orbitron mb-1">Workshops</h3>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Basic Circuitry & Bots</p>
-                                    <a href="https://forms.gle/RDu13w7CBCFCrVX68" target="_blank" class="text-xs font-bold text-lightPrimary dark:text-neonCyan uppercase tracking-widest hover:underline">Book Slot</a>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Basic Circuitry & Bots</p>
+                                    <a href="https://forms.gle/RDu13w7CBCFCrVX68" target="_blank" class="glass-btn text-xs py-2 px-6">Book Slot</a>
                                 </div>
                             </div>
                         </div>
@@ -241,13 +356,13 @@
                         <div class="mecha-card-container">
                             <div class="mecha-screen">
                                 <div class="h-48 relative overflow-hidden">
-                                    <img src="454522.jpg" class="w-full h-full object-cover">
-                                    <span class="absolute top-2 left-2 bg-lightPrimary text-white text-[10px] font-bold px-2 py-1 rounded font-orbitron shadow-md">LEVEL 2</span>
+                                    <img src="454522.jpg" class="card-img-zoom">
+                                    <span class="absolute top-2 left-2 bg-lightPrimary text-white text-[10px] font-bold px-3 py-1 rounded font-orbitron shadow-md animate-float-slow" style="animation-delay: 1s;">LEVEL 2</span>
                                 </div>
                                 <div class="p-6 text-center">
                                     <h3 class="text-xl font-bold font-orbitron mb-1">Bootcamps</h3>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Sensors & Coding</p>
-                                    <a href="https://forms.gle/RDu13w7CBCFCrVX68" target="_blank" class="text-xs font-bold text-lightPrimary dark:text-neonCyan uppercase tracking-widest hover:underline">Book Slot</a>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Sensors & Coding</p>
+                                    <a href="https://forms.gle/RDu13w7CBCFCrVX68" target="_blank" class="glass-btn text-xs py-2 px-6">Book Slot</a>
                                 </div>
                             </div>
                         </div>
@@ -257,13 +372,13 @@
                         <div class="mecha-card-container">
                             <div class="mecha-screen">
                                 <div class="h-48 relative overflow-hidden">
-                                    <img src="1762174226902.jpeg" class="w-full h-full object-cover">
-                                    <span class="absolute top-2 left-2 bg-purple-600 text-white text-[10px] font-bold px-2 py-1 rounded font-orbitron shadow-md">PRO</span>
+                                    <img src="1762174226902.jpeg" class="card-img-zoom">
+                                    <span class="absolute top-2 left-2 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded font-orbitron shadow-md animate-float-slow" style="animation-delay: 2s;">PRO</span>
                                 </div>
                                 <div class="p-6 text-center">
                                     <h3 class="text-xl font-bold font-orbitron mb-1">Training</h3>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Advanced Prototyping</p>
-                                    <a href="https://forms.gle/RDu13w7CBCFCrVX68" target="_blank" class="text-xs font-bold text-lightPrimary dark:text-neonCyan uppercase tracking-widest hover:underline">Book Slot</a>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Advanced Prototyping</p>
+                                    <a href="https://forms.gle/RDu13w7CBCFCrVX68" target="_blank" class="glass-btn text-xs py-2 px-6">Book Slot</a>
                                 </div>
                             </div>
                         </div>
@@ -275,7 +390,7 @@
         <!-- PAGE 2: INSIGHTS (Stats & Growth) -->
         <div id="page-insights" class="page-section">
             <div class="max-w-5xl mx-auto px-6 pb-20">
-                <h2 class="text-4xl md:text-6xl font-black font-orbitron text-center mb-16 text-slate-900 dark:text-white">Why Learn <span class="text-neonCyan">Robotics?</span></h2>
+                <h2 class="text-4xl md:text-6xl font-black font-orbitron text-center mb-16 text-slate-900 dark:text-white text-glow">Why Learn <span class="text-neonCyan">Robotics?</span></h2>
                 
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     <div class="ios-glass p-8 rounded-3xl dark:text-white">
@@ -336,7 +451,7 @@
         <!-- PAGE 3: WHAT WE DO (Detailed) -->
         <div id="page-services" class="page-section">
             <div class="max-w-6xl mx-auto px-6 pb-20">
-                <h2 class="text-4xl md:text-6xl font-black font-orbitron text-center mb-12 text-slate-900 dark:text-white">Our <span class="text-neonOrange">Ecosystem</span></h2>
+                <h2 class="text-4xl md:text-6xl font-black font-orbitron text-center mb-12 text-slate-900 dark:text-white text-glow">Our <span class="text-neonOrange">Ecosystem</span></h2>
                 
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div class="ios-glass p-8 rounded-3xl dark:text-white hover:scale-[1.02] transition-transform">
@@ -372,7 +487,7 @@
                     <div class="ios-glass p-8 rounded-3xl flex flex-col justify-center items-center text-center dark:text-white border-2 border-dashed border-gray-400 dark:border-gray-700">
                         <h3 class="text-xl font-bold mb-2">Have a Custom Project?</h3>
                         <p class="text-sm opacity-70 mb-4">We help build your ideas.</p>
-                        <button onclick="switchPage('contact')" class="px-6 py-2 bg-slate-800 dark:bg-white text-white dark:text-black rounded-full font-bold text-sm hover:opacity-90 transition-opacity">Contact Us</button>
+                        <button onclick="switchPage('contact')" class="glass-btn text-xs">Contact Us</button>
                     </div>
                 </div>
             </div>
@@ -402,7 +517,7 @@
                     </div>
                 </div>
 
-                <h2 class="text-3xl md:text-5xl font-black font-orbitron text-center mb-12 text-slate-900 dark:text-white">What They Say</h2>
+                <h2 class="text-3xl md:text-5xl font-black font-orbitron text-center mb-12 text-slate-900 dark:text-white text-glow">What They Say</h2>
                 
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="ios-glass p-8 rounded-3xl dark:text-white">
@@ -426,7 +541,7 @@
         <!-- PAGE 5: CONTACT -->
         <div id="page-contact" class="page-section">
             <div class="max-w-4xl mx-auto px-6 pb-20 flex flex-col items-center text-center">
-                <h2 class="text-4xl md:text-6xl font-black font-orbitron mb-8 text-slate-900 dark:text-white">Get In <span class="text-lightPrimary dark:text-neonCyan">Touch</span></h2>
+                <h2 class="text-4xl md:text-6xl font-black font-orbitron mb-8 text-slate-900 dark:text-white text-glow">Get In <span class="text-lightPrimary dark:text-neonCyan">Touch</span></h2>
                 
                 <p class="text-lg text-slate-600 dark:text-gray-300 max-w-lg mb-12 font-light">
                     Ready to start your robotics journey? Reach out to us directly via WhatsApp or Social Media.
@@ -648,6 +763,30 @@
         const starsMesh = new THREE.Points(starsGeo, starsMat);
         scene.add(starsMesh);
 
+        // --- NEURAL NETWORK PARTICLES (Alive Background) ---
+        const nodesGroup = new THREE.Group();
+        scene.add(nodesGroup);
+        const nodeGeo = new THREE.SphereGeometry(0.05, 8, 8);
+        const nodeMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4 }); // Cyan
+        const nodes = [];
+        
+        for(let i=0; i<30; i++) {
+            const node = new THREE.Mesh(nodeGeo, nodeMat);
+            node.position.set(
+                (Math.random() - 0.5) * 15,
+                (Math.random() - 0.5) * 10,
+                (Math.random() - 0.5) * 5 - 5 // Behind robot
+            );
+            // Random movement properties
+            node.userData = {
+                speed: Math.random() * 0.01 + 0.002,
+                offset: Math.random() * Math.PI * 2,
+                amp: Math.random() * 0.5 + 0.2
+            };
+            nodesGroup.add(node);
+            nodes.push(node);
+        }
+
         // Lights
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(ambientLight);
@@ -660,6 +799,8 @@
             scene.fog.color.setHex(isDark ? darkFog : lightFog);
             starsMesh.material.color.setHex(isDark ? 0xffffff : 0x1e293b);
             starsMesh.material.opacity = isDark ? 0.8 : 0.1;
+            // Update node color slightly
+            nodes.forEach(n => n.material.color.setHex(isDark ? 0x00F0FF : 0x2563eb));
         }
 
         // Hand Logic
@@ -712,17 +853,10 @@
         
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
-            
-            // Determine scroll direction (scrolling down increases scrollY)
-            // User requested: Anti-clockwise when scrolling down
-            // Positive rotation Y is Anti-clockwise (viewed from top in Three.js usually)
-            
-            // We calculate a rotation based on total scroll position
             const scrollFactor = currentScrollY * 0.002;
             
             // Update rotation
             if (robotGroup.visible) {
-               // When scrolling down (scrollFactor increases), rotation increases (Anti-Clockwise)
                robotGroup.rotation.y = scrollFactor;
             }
 
@@ -758,6 +892,15 @@
                     lfGroup.position.x = -0.6; rfGroup.position.x = 0.6;
                 }
             }
+
+            // Animate Neural Nodes (Alive Background)
+            nodes.forEach((node, i) => {
+                node.position.y += Math.sin(time * node.userData.speed + node.userData.offset) * 0.005;
+                node.position.x += Math.cos(time * node.userData.speed) * 0.005;
+                // Subtle pulse scale
+                const scale = 1 + Math.sin(time * 2 + i) * 0.2;
+                node.scale.set(scale, scale, scale);
+            });
             
             renderer.render(scene, camera);
         }

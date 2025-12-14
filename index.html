@@ -863,13 +863,22 @@
             lastScrollY = currentScrollY;
         });
 
-        // Resize Logic to hide hand on mobile
+        // Resize Logic to hide hand on mobile & Prevent vertical scroll glitch
+        let lastWidth = window.innerWidth; // Track width to ignore vertical resize (address bar)
+        
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            if (window.innerWidth < 768) {
-                masterHandGroup.visible = false;
+            // Only resize 3D scene if width changes (orientation change or desktop resize)
+            // This prevents the robot from "jumping" when mobile address bars retract on scroll
+            if (window.innerWidth !== lastWidth) {
+                lastWidth = window.innerWidth;
+                
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                
+                if (window.innerWidth < 768) {
+                    masterHandGroup.visible = false;
+                }
             }
         });
 
@@ -879,8 +888,8 @@
             const time = Date.now() * 0.001;
 
             if(robotGroup.visible) {
-                // Bobbing motion
-                robotGroup.position.y = (Math.sin(time) * 0.1) - 0.5;
+                // Fixed position (Removed bobbing motion to prevent shifting)
+                robotGroup.position.y = -0.5;
                 
                 // Animate Hand
                 masterHandGroup.position.lerp(targetPos, 0.1);
